@@ -12,10 +12,6 @@ redundant_avail_t = 1000000000 * bitarray('0')
 
 def prepare_data(lines):
 
-    global redundant_avail_t
-    global guard_avail_t
-    temp_buf = 1000000000 * bitarray('0')
-
     for line in lines:
         t_slot = line.strip().split(' ')
         start = int(t_slot[0])
@@ -23,20 +19,16 @@ def prepare_data(lines):
    
         #print ("start %d end %d" %(start, end))
         # Mark availability
-        temp_buf[:] = 0
-        temp_buf[start:end] = 1
-
-        # check duplicate and maintain redundant time slots
-        redundant_avail_t = redundant_avail_t | (guard_avail_t & temp_buf)
-
-        # Update cumulative guard available slots
-        guard_avail_t = guard_avail_t | temp_buf
-
+        for i in range(start, end):
+            if not guard_avail_t[i]:
+                #print ("guard not found available so far in %d slot, setting this slot" %i)
+                guard_avail_t[i] = 1
+            else:
+                #print("guard already available in %d slot, so marking this slot redundant" %i)
+                redundant_avail_t[i] = 1
 
 
 def func(lines):
-    global redundant_avail_t
-    global guard_avail_t
     min_impact = sys.maxsize
     min_imp_guard_id = 0
     guard_id = 0
@@ -47,7 +39,9 @@ def func(lines):
         end = int(t_slot[1])
         impact = 0 
         # check for impact if removed
-        impact = redundant_avail_t[start:end].count(0)
+        for i in range(start, end):
+            if not redundant_avail_t[i]:
+                impact += 1
 
         if impact < min_impact:
             min_impact = impact
@@ -62,7 +56,9 @@ def func(lines):
     start = int(t_slot[0])
     end = int(t_slot[1])
 
-    guard_avail_t[start:end] = guard_avail_t[start:end] & redundant_avail_t[start:end]
+    for i in range(start, end):
+        if not redundant_avail_t[i]:
+            guard_avail_t[i] = 0
 
     # calculate time coverage after firing min impactful lifeguard
     return guard_avail_t.count(1)
