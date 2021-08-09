@@ -12,6 +12,7 @@ redundant_avail_t = 1000000000 * bitarray('0')
 
 def prepare_data(lines):
 
+    count = 1
     for line in lines:
         t_slot = line.strip().split(' ')
         start = int(t_slot[0])
@@ -27,6 +28,8 @@ def prepare_data(lines):
                 #print("guard already available in %d slot, so marking this slot redundant" %i)
                 redundant_avail_t[i] = 1
 
+        print("guard number %d" %count)
+        count += 1
 
 def func(lines):
     min_impact = sys.maxsize
@@ -78,6 +81,10 @@ def main():
     # identify the guard with least impact on time coverage on firing.
     result = func(lines)
     print ("Maximum time coverage after removing one lifeguard : %d\n" % result)
+
+    f = open("6.out", "w")
+    f.write(str(result))
+    f.close()
 
 
 if __name__ == "__main__":

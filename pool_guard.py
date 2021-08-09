@@ -15,7 +15,8 @@ def prepare_data(lines):
     global redundant_avail_t
     global guard_avail_t
     temp_buf = 1000000000 * bitarray('0')
-
+    count = 1
+    
     for line in lines:
         t_slot = line.strip().split(' ')
         start = int(t_slot[0])
@@ -31,6 +32,9 @@ def prepare_data(lines):
 
         # Update cumulative guard available slots
         guard_avail_t = guard_avail_t | temp_buf
+
+        #print("guard num %d" %count)
+        count += 1
 
 
 
@@ -82,6 +86,10 @@ def main():
     # identify the guard with least impact on time coverage on firing.
     result = func(lines)
     print ("Maximum time coverage after removing one lifeguard : %d\n" % result)
+
+    f = open("5.out", "a")
+    f.write(str(result))
+    f.close()
 
 
 if __name__ == "__main__":
